@@ -8,11 +8,30 @@ import {
   TextInput,
 } from "react-native";
 
+const scrambleWord = (word) => {
+  const arr = [...word];
+  const scrambled = [];
+  while (arr.length > 0) {
+    swap(arr, getRandomIndex(arr.length), arr.length - 1);
+    scrambled.push(arr.pop());
+  }
+  return scrambled.join("");
+};
+
+const getRandomIndex = (len) => {
+  return Math.floor(Math.random() * len);
+};
+
+const swap = (arr, i, j) => {
+  const copy = arr[i];
+  arr[i] = arr[j];
+  arr[j] = copy;
+};
+
 export default function App() {
   const [userInput, setUserInput] = useState("");
   const [currentWord, setCurrentWord] = useState("");
   const [scrambledWord, setScrambledWord] = useState("");
-
   const [guessedCorrectly, setGuessedCorrectly] = useState(false);
   const [words, setWords] = useState([
     "hello",
@@ -37,26 +56,6 @@ export default function App() {
     }
   };
 
-  const scrambleWord = (word) => {
-    const arr = [...word];
-    const scrambled = [];
-    while (arr.length > 0) {
-      swap(arr, getRandomIndex(arr.length), arr.length - 1);
-      scrambled.push(arr.pop());
-    }
-    return scrambled.join("");
-  };
-
-  const getRandomIndex = (len) => {
-    return Math.floor(Math.random() * len);
-  };
-
-  const swap = (arr, i, j) => {
-    const copy = arr[i];
-    arr[i] = arr[j];
-    arr[j] = copy;
-  };
-
   return (
     <View style={styles.container}>
       {guessedCorrectly === false ? (
@@ -67,7 +66,6 @@ export default function App() {
             placeholder="Type something here."
             onChangeText={(value) => {
               if (value.toLowerCase() === currentWord) {
-                console.log("Match!");
                 setGuessedCorrectly(true);
               }
               setUserInput(value);
