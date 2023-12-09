@@ -1,18 +1,50 @@
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  TextInput,
+} from "react-native";
 
 export default function App() {
-  const [alphabet, setAlphabet] = useState("abcdefghijklmnopqrstuvwxyz");
+  const [userInput, setUserInput] = useState("");
+  const [currentWord, setCurrentWord] = useState("");
+  const [scrambledWord, setScrambledWord] = useState("");
 
-  const scrambleAlphabet = () => {
-    const arr = [...alphabet];
+  const [guessedCorrectly, setGuessedCorrectly] = useState(false);
+  const [words, setWords] = useState([
+    "hello",
+    "world",
+    "python",
+    "javascript",
+    "apple",
+    "amazon",
+    "facebook",
+    "google",
+  ]);
+
+  const getRandomWord = () => {
+    const randomIndex = getRandomIndex(words.length);
+    if (words.length > 0) {
+      swap(words, randomIndex, words.length - 1);
+      const newWord = words.pop();
+      setCurrentWord(newWord);
+      setScrambledWord(scrambleWord(newWord));
+    } else {
+      setCurrentWord("Game over!");
+    }
+  };
+
+  const scrambleWord = (word) => {
+    const arr = [...word];
     const scrambled = [];
     while (arr.length > 0) {
-      arr.swap(arr, getRandomIndex(arr.length), arr.length - 1);
+      swap(arr, getRandomIndex(arr.length), arr.length - 1);
       scrambled.push(arr.pop());
     }
-    setAlphabet(scrambled.join(""));
+    return scrambled.join("");
   };
 
   const getRandomIndex = (len) => {
@@ -27,15 +59,41 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text>Alphabet: 'abcdefghijklmnopqrstuvwxyz'</Text>
-      <Text>Scrambled Alphabet: {alphabet}</Text>
+      {guessedCorrectly === false ? (
+        <>
+          <Text>Word: {scrambledWord}</Text>
+          <TextInput
+            value={userInput}
+            placeholder="Type something here."
+            onChangeText={(value) => {
+              if (value.toLowerCase() === currentWord) {
+                console.log("Match!");
+                setGuessedCorrectly(true);
+              }
+              setUserInput(value);
+            }}
+            style={{
+              borderColor: "grey",
+              width: "80%",
+              padding: 10,
+              borderWidth: 1,
+              borderRadius: 15,
+            }}
+          />
+        </>
+      ) : (
+        <Text>You guessed correctly!</Text>
+      )}
+
       <TouchableOpacity
         style={styles.scrambleButton}
         onPress={() => {
-          scrambleAlphabet();
+          getRandomWord();
+          setUserInput("");
+          setGuessedCorrectly(false);
         }}
       >
-        <Text style={{ fontSize: 18 }}>Scramble</Text>
+        <Text style={{ fontSize: 18 }}>Display Random Word</Text>
       </TouchableOpacity>
     </View>
   );
